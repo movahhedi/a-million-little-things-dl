@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { existsSync } from "fs";
 import { readFile, writeFile, appendFile, access, constants } from "fs/promises";
 import * as dotenv from "dotenv";
