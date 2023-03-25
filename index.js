@@ -3,11 +3,11 @@
 import { existsSync } from "fs";
 import { readFile, writeFile, appendFile, access, constants } from "fs/promises";
 import dotenv from "dotenv";
-import { dirname, join } from "path";
+import path from "path";
 import { fileURLToPath } from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: join(__dirname, ".env") });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 let urls,
 	lastNotifiedEpisode = 0;
@@ -19,22 +19,22 @@ const GenerateFileUrl = (episode, type = "hdtv") =>
 
 const AddToLog = (data) => {
 	const params = [
-		"data/log.txt",
+		path.join(__dirname, "data", "log.txt"),
 		JSON.stringify({
 			time: new Date().toString(),
 			...data,
 		}) + "\r\n",
 	];
 
-	if (existsSync("data/log.txt")) {
+	if (existsSync(path.join(__dirname, "data", "log.txt"))) {
 		return appendFile(...params);
 	} else {
 		return writeFile(...params);
 	}
 };
 
-access("data/latest.txt", constants.W_OK | constants.R_OK)
-	.then(() => readFile("data/latest.txt", "utf8"))
+access(path.join(__dirname, "data", "latest.txt"), constants.W_OK | constants.R_OK)
+	.then(() => readFile(path.join(__dirname, "data", "latest.txt"), "utf8"))
 	.then((result) => {
 		lastNotifiedEpisode = result;
 	})
@@ -86,7 +86,7 @@ access("data/latest.txt", constants.W_OK | constants.R_OK)
 	})
 	.then((MattermostResponse) => {
 		if (MattermostResponse?.ok) {
-			writeFile("data/latest.txt", urls.length.toString()).catch(null);
+			writeFile(path.join(__dirname, "data", "latest.txt"), urls.length.toString()).catch(null);
 			return AddToLog({
 				status: "Report SUCCESS",
 			});
