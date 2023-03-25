@@ -1,7 +1,13 @@
+#!/usr/bin/env node
+
 import { existsSync } from "fs";
 import { readFile, writeFile, appendFile, access, constants } from "fs/promises";
-import * as dotenv from "dotenv";
-dotenv.config();
+import dotenv from "dotenv";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, ".env") });
 
 let urls,
 	lastNotifiedEpisode = 0;
@@ -90,6 +96,7 @@ access("data/latest.txt", constants.W_OK | constants.R_OK)
 			});
 		}
 	})
+	.then(() => console.log("SUCCESS"))
 	.catch((error) => {
 		console.error("ERROR");
 		console.error(error);
