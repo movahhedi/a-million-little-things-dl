@@ -49,9 +49,9 @@ access(LatestFilePath, constants.W_OK | constants.R_OK)
 	.then((response) => {
 		let x = response.split('<div class="dl-main">', 2)[1],
 			y = x.split("zirnevis", 2)[0],
-			matches = [...y.matchAll('https://1da.ir/(.*)"')];
+			matches = [...y.matchAll('https://(.*)"')];
 
-		urls = matches.map((match) => "https://1da.ir/" + match[1]);
+		urls = matches.map((match) => "https://" + match[1]);
 		return urls;
 	})
 	.then((urls) =>
@@ -69,7 +69,7 @@ access(LatestFilePath, constants.W_OK | constants.R_OK)
 		if (SuccessfulResponse) {
 			message += `Ep. ${urls.length} Direct URL:\n${SuccessfulResponse.url}`;
 		} else {
-			message += `Couldn't find URL of ep. ${urls.length}.`;
+			message += `Couldn't find URL of ep. ${urls.length}.\nCheck ${process.env.A_MILLION_DOWNLOAD_URL}`;
 		}
 
 		if (lastNotifiedEpisode < urls.length) {
@@ -85,21 +85,29 @@ access(LatestFilePath, constants.W_OK | constants.R_OK)
 					// props: { attachments: [{ pretext: "Look some text", text: "This is text" }] },
 				}),
 			});
-		} else return false;
+		} else return null;
 	})
 	.then((MattermostResponse) => {
 		if (MattermostResponse?.ok) {
 			writeFile(LatestFilePath, urls.length.toString()).catch(null);
+			console.log(`Report SUCCESS. Latest Episode: ${urls.length}`);
 			return AddToLog({
-				status: "Report SUCCESS",
+				status: `Report SUCCESS. Latest Episode: ${urls.length}`,
+			});
+		} else if (MattermostResponse === null) {
+			console.log(`Already Reported. Latest Episode: ${urls.length}`);
+			return AddToLog({
+				status: `Already Reported. Latest Episode: ${urls.length}`,
 			});
 		} else {
+			console.log(`ERROR. Latest Episode: ${urls.length}`, MattermostResponse);
 			return AddToLog({
-				status: "Already Reported",
+				status: `ERROR. Latest Episode: ${urls.length}`,
+				error: MattermostResponse.statusText,
 			});
 		}
 	})
-	.then(() => console.log("SUCCESS"))
+	// .then(() => console.log("Report SUCCESS"))
 	.catch((error) => {
 		console.error("ERROR");
 		console.error(error);
