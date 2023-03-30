@@ -1,6 +1,6 @@
 {
 	"name": "a-million-little-things-dl",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"main": "index.js",
 	"author": "Shahab Movahhedi",
 	"license": "MIT",
